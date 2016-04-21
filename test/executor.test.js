@@ -906,6 +906,43 @@ describe('executor', function() {
     });
   });
 
+  describe('when booting with lazy connect', function() {
+    it.only('should report error', function(done) {
+      var datasource = {
+        mongodbDS: {
+          host: 'invalid-host',
+          port: 80,
+          connector: "mongodb",
+          name: "mongoDS",
+        },
+      };
+      function doBoot() {
+        boot.execute(app, someInstructions({ dataSources: datasource }));
+      };
+      // for some reason Error is uncaught
+      // Error msg is 'getaddrinfo ENOTFOUND invalid-host invalid-host:80'
+      expect(doBoot).to.throw(Error);
+    });
+
+    it('should not report error', function(done) {
+      process.env.LB_LAZYCONNECT_DATASOURCES = true;
+      var datasource = {
+        mongodbDS: {
+          host: 'invalid-host',
+          port: 80,
+          connector: "mongodb",
+          name: "mongoDS",
+        },
+      };
+      function doBoot() {
+        boot.execute(app, someInstructions({ dataSources: datasource }));
+      };
+      // Could only pass after mongodb pr merged
+      // https://github.com/strongloop/loopback-connector-mongodb/pull/241
+      expect(doBoot).to.not.throw(Error);
+    });
+  });
+
   describe('dynamic configuration for datasources.json', function() {
     beforeEach(function() {
       delete process.env.DYNAMIC_HOST;
