@@ -21,7 +21,7 @@ describe('compiler', function() {
 
     beforeEach(function() {
       options = {
-        config: {
+        application: {
           port: 3000,
           host: '127.0.0.1',
           restApiRoot: '/rest-api',
@@ -41,7 +41,7 @@ describe('compiler', function() {
         }
       };
       instructions = boot.compile(options);
-      appConfig = instructions.config;
+      appConfig = instructions.application;
     });
 
     it('has port setting', function() {
@@ -546,7 +546,7 @@ describe('compiler', function() {
         { cfgEnv: 'applied' });
 
       var instructions = boot.compile(appdir.PATH);
-      var appConfig = instructions.config;
+      var appConfig = instructions.application;
 
       expect(appConfig).to.have.property('cfgLocal', 'applied');
       expect(appConfig).to.have.property('cfgEnv', 'applied');
@@ -565,7 +565,7 @@ describe('compiler', function() {
         'module.exports = { fromJs: true };');
 
       var instructions = boot.compile(appdir.PATH);
-      var appConfig = instructions.config;
+      var appConfig = instructions.application;
 
       expect(appConfig).to.have.property('fromJs', true);
     });
@@ -584,7 +584,7 @@ describe('compiler', function() {
         appConfigRootDir: path.resolve(appdir.PATH, 'custom')
       });
 
-      expect(instructions.config).to.have.property('port');
+      expect(instructions.application).to.have.property('port');
     });
 
     it('supports `dsRootDir` option', function() {
@@ -624,7 +624,7 @@ describe('compiler', function() {
       var initJs = appdir.writeFileSync('boot/init.js',
         'module.exports = function(app) { app.fnCalled = true; };');
       var instructions = boot.compile(appdir.PATH);
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('supports `bootDirs` option', function() {
@@ -635,7 +635,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs: [path.dirname(initJs)]
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('should resolve relative path in `bootDirs`', function() {
@@ -646,7 +646,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs:['./custom-boot']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('should resolve non-relative path in `bootDirs`', function() {
@@ -656,7 +656,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs:['custom-boot']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('ignores index.js in `bootDirs`', function() {
@@ -666,7 +666,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs:['./custom-boot']
       });
-      expect(instructions.files.boot).to.have.length(0);
+      expect(instructions.bootScripts).to.have.length(0);
     });
 
     it('prefers coffeescript over json in `appRootDir/bootDir`', function() {
@@ -678,7 +678,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs: ['./custom-boot']
       });
-      expect(instructions.files.boot).to.eql([coffee]);
+      expect(instructions.bootScripts).to.eql([coffee]);
     });
 
     it('prefers coffeescript over json in `bootDir` non-relative path',
@@ -692,7 +692,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootDirs: ['custom-boot']
       });
-      expect(instructions.files.boot).to.eql([coffee]);
+      expect(instructions.bootScripts).to.eql([coffee]);
     });
 
     it('supports `bootScripts` option', function() {
@@ -703,7 +703,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: [initJs]
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('should remove duplicate scripts', function() {
@@ -715,7 +715,7 @@ describe('compiler', function() {
         bootDirs:[path.dirname(initJs)],
         bootScripts: [initJs]
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('should resolve relative path in `bootScripts`', function() {
@@ -726,7 +726,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: ['./custom-boot/init.js']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('should resolve non-relative path in `bootScripts`', function() {
@@ -736,7 +736,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: ['custom-boot/init.js']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('resolves missing extensions in `bootScripts`', function() {
@@ -746,7 +746,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts:['./custom-boot/init']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('resolves missing extensions in `bootScripts` in module relative path',
@@ -758,7 +758,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: ['custom-boot/init']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('resolves module relative path for `bootScripts`', function() {
@@ -768,7 +768,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: ['custom-boot/init.js']
       });
-      expect(instructions.files.boot).to.eql([initJs]);
+      expect(instructions.bootScripts).to.eql([initJs]);
     });
 
     it('explores `bootScripts` in app relative path', function() {
@@ -781,7 +781,7 @@ describe('compiler', function() {
         appRootDir: appdir.PATH,
         bootScripts: ['custom-boot/init.js']
       });
-      expect(instructions.files.boot).to.eql([appJs]);
+      expect(instructions.bootScripts).to.eql([appJs]);
     });
 
     it('ignores models/ subdirectory', function() {
@@ -790,7 +790,7 @@ describe('compiler', function() {
 
       var instructions = boot.compile(appdir.PATH);
 
-      expect(instructions.files).to.not.have.property('models');
+      expect(instructions.bootScripts).to.not.have.property('models');
     });
 
     it('throws when models-config.json contains 1.x `properties`', function() {
@@ -1250,10 +1250,10 @@ describe('compiler', function() {
       appdir.createConfigFilesSync();
 
       var instructions = boot.compile(appdir.PATH);
-      instructions.config.modified = true;
+      instructions.application.modified = true;
 
       instructions = boot.compile(appdir.PATH);
-      expect(instructions.config).to.not.have.property('modified');
+      expect(instructions.application).to.not.have.property('modified');
     });
 
     describe('for mixins', function() {

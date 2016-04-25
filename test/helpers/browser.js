@@ -41,7 +41,9 @@ function createContext() {
         warn: [],
         error: []
       },
-    }
+    },
+
+    ArrayBuffer: ArrayBuffer
   };
 
   // `window` is used by loopback to detect browser runtime
